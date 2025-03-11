@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nationalize API Checker</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 50px;
+            background-color: #f4f4f9;
+            color: #333;
+        }
+        input {
+            padding: 10px;
+            margin: 5px;
+            border: 2px solid #007BFF;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        button {
+            padding: 10px 15px;
+            margin: 5px;
+            border: none;
+            background-color: #007BFF;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: background 0.3s;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        #result {
+            margin-top: 20px;
+            background: white;
+            padding: 15px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            display: inline-block;
+        }
+    </style>
+</head>
+<body>
+    <h2>Ismingizni kiriting</h2>
+    <input type="text" id="nameInput" placeholder="Ismingizni yozing...">
+    <button onclick="checkNationality()">Tekshirish</button>
+    <div id="result"></div>
+
+    <script>
+        function checkNationality() {
+            let name = document.getElementById("nameInput").value;
+            if (!name) {
+                alert("Iltimos, ism kiriting!");
+                return;
+            }
+            
+            fetch(`https://api.nationalize.io/?name=${name}`)
+                .then(response => response.json())
+                .then(data => {
+                    let resultDiv = document.getElementById("result");
+                    resultDiv.innerHTML = "";
+                    
+                    if (data.country.length === 0) {
+                        resultDiv.innerHTML = `<p>Natija topilmadi.</p>`;
+                        return;
+                    }
+                    
+                    data.country.forEach(item => {
+                        let countryName = item.country_id;
+                        let probability = (item.probability * 100).toFixed(2);
+                        resultDiv.innerHTML += `<p>${countryName}: ${probability}%</p>`;
+                    });
+                })
+                .catch(error => {
+                    console.error("Xatolik yuz berdi", error);
+                    document.getElementById("result").innerHTML = `<p>Xatolik yuz berdi!</p>`;
+                });
+        }
+    </script>
+</body>
+</html>
